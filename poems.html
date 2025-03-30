@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poem Series - Starlight</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .poem-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        .poem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-indigo-900 via-purple-900 to-pink-900 min-h-screen text-white font-['Poppins']">
+    <!-- Navigation -->
+    <nav class="py-6 px-4 md:px-12 flex justify-between items-center">
+        <a href="index.html" class="text-2xl font-['Playfair_Display'] font-bold">Starlight</a>
+        <div class="hidden md:flex space-x-8">
+            <a href="index.html" class="hover:text-pink-300 transition">Home</a>
+            <a href="quotes.html" class="hover:text-pink-300 transition">Quotes</a>
+            <a href="gallery.html" class="hover:text-pink-300 transition">Gallery</a>
+            <a href="memories.html" class="hover:text-pink-300 transition">Memories</a>
+            <a href="poems.html" class="text-pink-300 font-semibold">Poems</a>
+        </div>
+        <button class="md:hidden text-2xl">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12">
+        <h1 class="text-3xl md:text-4xl font-['Playfair_Display'] font-bold mb-8 text-center">
+            Poem Series for Starlight
+        </h1>
+        
+        <!-- Add New Poem -->
+        <div class="max-w-2xl mx-auto bg-purple-900 bg-opacity-50 rounded-xl p-6 mb-12 border border-purple-300 border-opacity-20">
+            <h2 class="text-2xl font-['Playfair_Display'] font-bold mb-4">Compose a New Poem</h2>
+            <div class="mb-4">
+                <input type="text" id="poemTitle" class="w-full bg-purple-800 bg-opacity-50 border border-purple-300 border-opacity-30 rounded-lg p-3 text-white placeholder-purple-300 mb-2" placeholder="Episode title...">
+                <textarea id="poemContent" class="w-full bg-purple-800 bg-opacity-50 border border-purple-300 border-opacity-30 rounded-lg p-3 text-white placeholder-purple-300" rows="6" placeholder="Write your poem for Starlight..."></textarea>
+            </div>
+            <button onclick="savePoem()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full transition">
+                Publish Poem
+            </button>
+        </div>
+        
+        <!-- Poem Series -->
+        <div id="poemsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Poems will be loaded here -->
+        </div>
+    </main>
+
+    <script>
+        // Initialize poems in localStorage if empty
+        if (!localStorage.getItem('starlightPoems')) {
+            const samplePoems = [
+                {
+                    title: "Episode 1: First Light",
+                    content: "In the quiet before dawn,\nWhen stars still whisper their secrets,\nYour light found me,\nA beacon in my darkness."
+                },
+                {
+                    title: "Episode 2: Celestial Dance",
+                    content: "We orbit each other,\nLike planets bound by gravity,\nA cosmic waltz of hearts,\nWritten in the stars."
+                }
+            ];
+            localStorage.setItem('starlightPoems', JSON.stringify(samplePoems));
+        }
+
+        // Load poems from localStorage
+        function loadPoems() {
+            const poems = JSON.parse(localStorage.getItem('starlightPoems')) || [];
+            const container = document.getElementById('poemsContainer');
+            container.innerHTML = '';
+
+            if (poems.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <p class="text-xl text-pink-200">No poems yet. Write your first poem above!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            poems.forEach((poem, index) => {
+                const poemCard = document.createElement('div');
+                poemCard.className = 'poem-card rounded-xl p-6 border border-purple-300 border-opacity-30 fade-in';
+                poemCard.innerHTML = `
+                    <h3 class="text-xl font-bold mb-2">${poem.title}</h3>
+                    <p class="whitespace-pre-line text-gray-200">${poem.content}</p>
+                `;
+                container.appendChild(poemCard);
+            });
+        }
+
+        // Save new poem
+        function savePoem() {
+            const title = document.getElementById('poemTitle').value.trim();
+            const content = document.getElementById('poemContent').value.trim();
+
+            if (title && content) {
+                const poems = JSON.parse(localStorage.getItem('starlightPoems')) || [];
+                poems.push({ title, content });
+                localStorage.setItem('starlightPoems', JSON.stringify(poems));
+
+                // Reset form
+                document.getElementById('poemTitle').value = '';
+                document.getElementById('poemContent').value = '';
+
+                // Refresh poems display
+                loadPoems();
+                alert('Poem published successfully!');
+            } else {
+                alert('Please fill in both title and content before publishing.');
+            }
+        }
+
+        // Load poems on page load
+        window.onload = loadPoems;
+    </script>
+</body>
+</html>
