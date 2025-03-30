@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Gallery - Starlight</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .gallery-item {
+            transition: all 0.3s ease;
+        }
+        .gallery-item:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        .lightbox {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-indigo-900 via-purple-900 to-pink-900 min-h-screen text-white font-['Poppins']">
+    <!-- Navigation -->
+    <nav class="py-6 px-4 md:px-12 flex justify-between items-center">
+        <a href="index.html" class="text-2xl font-['Playfair_Display'] font-bold">Starlight</a>
+        <div class="hidden md:flex space-x-8">
+            <a href="index.html" class="hover:text-pink-300 transition">Home</a>
+            <a href="quotes.html" class="hover:text-pink-300 transition">Quotes</a>
+            <a href="gallery.html" class="text-pink-300 font-semibold">Gallery</a>
+            <a href="memories.html" class="hover:text-pink-300 transition">Memories</a>
+            <a href="poems.html" class="hover:text-pink-300 transition">Poems</a>
+        </div>
+        <button class="md:hidden text-2xl">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12">
+        <h1 class="text-3xl md:text-4xl font-['Playfair_Display'] font-bold mb-8 text-center">
+            Our Precious Moments
+        </h1>
+        
+        <!-- Upload Section -->
+        <div class="max-w-2xl mx-auto bg-purple-900 bg-opacity-50 rounded-xl p-6 mb-12 border border-purple-300 border-opacity-20">
+            <h2 class="text-2xl font-['Playfair_Display'] font-bold mb-4">Add New Memories</h2>
+            <div class="flex flex-col md:flex-row gap-4 mb-4">
+                <div class="flex-1">
+                    <input type="file" id="imageUpload" accept="image/*" class="hidden">
+                    <label for="imageUpload" class="block bg-pink-600 hover:bg-pink-700 text-white text-center font-bold py-3 px-6 rounded-full transition cursor-pointer">
+                        <i class="fas fa-upload mr-2"></i> Choose Photo
+                    </label>
+                </div>
+                <div class="flex-1">
+                    <input type="text" id="imageCaption" class="w-full bg-purple-800 bg-opacity-50 border border-purple-300 border-opacity-30 rounded-lg p-3 text-white placeholder-purple-300" placeholder="Add a caption...">
+                </div>
+            </div>
+            <button onclick="uploadImage()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full transition">
+                Save Memory
+            </button>
+            <div id="imagePreview" class="mt-4 hidden">
+                <img id="previewImage" class="max-h-64 rounded-lg border border-purple-300 border-opacity-30">
+            </div>
+        </div>
+        
+        <!-- Gallery Grid -->
+        <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <!-- Images will be loaded here -->
+        </div>
+    </main>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="fixed inset-0 z-50 flex items-center justify-center lightbox hidden">
+        <div class="relative max-w-4xl w-full p-4">
+            <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white text-3xl z-10">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="relative">
+                <img id="lightboxImage" class="max-h-[80vh] mx-auto rounded-lg">
+                <p id="lightboxCaption" class="text-center mt-4 text-xl text-pink-200"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize gallery in localStorage if empty
+        if (!localStorage.getItem('starlightGallery')) {
+            // Sample images (can be removed or kept as examples)
+            const sampleImages = [
+                {
+                    src: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+                    caption: "Our first starry night"
+                },
+                {
+                    src: "https://images.unsplash.com/photo-1534447677768-be436bb09401?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+                    caption: "Moonlight walk"
+                }
+            ];
+            localStorage.setItem('starlightGallery', JSON.stringify(sampleImages));
+        }
+
+        // Preview selected image
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const preview = document.getElementById('imagePreview');
+                    const previewImage = document.getElementById('previewImage');
+                    previewImage.src = event.target.result;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Upload image to gallery
+        function uploadImage() {
+            const fileInput = document.getElementById('imageUpload');
+            const captionInput = document.getElementById('imageCaption');
+            
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    const gallery = JSON.parse(localStorage.getItem('starlightGallery')) || [];
+                    const newImage = {
+                        src: event.target.result,
+                        caption: captionInput.value.trim() || "Our precious moment"
+                    };
+                    
+                    gallery.push(newImage);
+                    localStorage.setItem('starlightGallery', JSON.stringify(gallery));
+                    
+                    // Reset form
+                    fileInput.value = '';
+                    captionInput.value = '';
+                    document.getElementById('imagePreview').classList.add('hidden');
+                    
+                    // Refresh gallery
+                    loadGallery();
+                    alert('Photo added to gallery!');
+                };
+                
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please select a photo to upload');
+            }
+        }
+
+        // Load gallery from localStorage
+        function loadGallery() {
+            const gallery = JSON.parse(localStorage.getItem('starlightGallery')) || [];
+            const galleryGrid = document.getElementById('galleryGrid');
+            
+            galleryGrid.innerHTML = '';
+            
+            if (gallery.length === 0) {
+                galleryGrid.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <p class="text-xl text-pink-200">No photos yet. Upload your first memory!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            gallery.forEach((image, index) => {
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item rounded-xl overflow-hidden fade-in';
+                galleryItem.innerHTML = `
+                    <div onclick="openLightbox(${index})" class="cursor-pointer">
+                        <img src="${image.src}" class="w-full h-64 object-cover" loading="lazy">
+                        <div class="p-4 bg-purple-900 bg-opacity-50">
+                            <p class="truncate">${image.caption}</p>
+                        </div>
+                    </div>
+                `;
+                galleryGrid.appendChild(galleryItem);
+            });
+        }
+
+        // Lightbox functions
+        function openLightbox(index) {
+            const gallery = JSON.parse(localStorage.getItem('starlightGallery')) || [];
+            if (gallery[index]) {
+                const lightbox = document.getElementById('lightbox');
+                const lightboxImage = document.getElementById('lightboxImage');
+                const lightboxCaption = document.getElementById('lightboxCaption');
+                
+                lightboxImage.src = gallery[index].src;
+                lightboxCaption.textContent = gallery[index].caption;
+                lightbox.classList.remove('hidden');
+            }
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.add('hidden');
+        }
+
+        // Load gallery on page load
+        window.onload = loadGallery;
+    </script>
+</body>
+</html>
