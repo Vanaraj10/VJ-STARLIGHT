@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotes for Starlight</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .quote-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%);
+            backdrop-filter: blur(10px);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-indigo-900 via-purple-900 to-pink-900 min-h-screen text-white font-['Poppins']">
+    <!-- Navigation -->
+    <nav class="py-6 px-4 md:px-12 flex justify-between items-center">
+        <a href="index.html" class="text-2xl font-['Playfair_Display'] font-bold">Starlight</a>
+        <div class="hidden md:flex space-x-8">
+            <a href="index.html" class="hover:text-pink-300 transition">Home</a>
+            <a href="quotes.html" class="text-pink-300 font-semibold">Quotes</a>
+            <a href="gallery.html" class="hover:text-pink-300 transition">Gallery</a>
+            <a href="memories.html" class="hover:text-pink-300 transition">Memories</a>
+            <a href="poems.html" class="hover:text-pink-300 transition">Poems</a>
+        </div>
+        <button class="md:hidden text-2xl">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12">
+        <h1 class="text-3xl md:text-4xl font-['Playfair_Display'] font-bold mb-8 text-center">
+            Quotes for My Starlight
+        </h1>
+        
+        <!-- Quote Display -->
+        <div class="max-w-2xl mx-auto mb-12">
+            <div id="quoteContainer" class="quote-card rounded-xl p-8 mb-6 border border-purple-300 border-opacity-30 fade-in">
+                <p id="quoteText" class="text-xl md:text-2xl italic mb-4">Click the button below to see a random quote</p>
+                <p id="quoteDate" class="text-right text-pink-200"></p>
+            </div>
+            
+            <div class="flex justify-center">
+                <button onclick="getRandomQuote()" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-8 rounded-full transition transform hover:scale-105 shadow-lg flex items-center">
+                    <i class="fas fa-star mr-2"></i> Show Me a Quote
+                </button>
+            </div>
+        </div>
+        
+        <!-- Add New Quote -->
+        <div class="max-w-2xl mx-auto bg-purple-900 bg-opacity-50 rounded-xl p-6 border border-purple-300 border-opacity-20">
+            <h2 class="text-2xl font-['Playfair_Display'] font-bold mb-4">Add a New Quote</h2>
+            <textarea id="newQuote" class="w-full bg-purple-800 bg-opacity-50 border border-purple-300 border-opacity-30 rounded-lg p-4 mb-4 text-white placeholder-purple-300" rows="4" placeholder="Write your heartfelt quote for Starlight..."></textarea>
+            <button onclick="addQuote()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full transition">
+                Save Quote
+            </button>
+        </div>
+    </main>
+
+    <script>
+        // Initialize quotes in localStorage if empty
+        if (!localStorage.getItem('starlightQuotes')) {
+            const defaultQuotes = [
+                { text: "You are the starlight that guides me through my darkest nights.", date: "2023-05-12" },
+                { text: "In a universe full of stars, you shine the brightest.", date: "2023-06-18" },
+                { text: "Your love is the constellation that maps my heart.", date: "2023-07-22" }
+            ];
+            localStorage.setItem('starlightQuotes', JSON.stringify(defaultQuotes));
+        }
+
+        function getRandomQuote() {
+            const quotes = JSON.parse(localStorage.getItem('starlightQuotes'));
+            if (quotes && quotes.length > 0) {
+                const randomIndex = Math.floor(Math.random() * quotes.length);
+                const quote = quotes[randomIndex];
+                
+                document.getElementById('quoteText').textContent = `"${quote.text}"`;
+                document.getElementById('quoteDate').textContent = quote.date ? `— ${new Date(quote.date).toLocaleDateString()}` : '';
+                
+                // Add animation
+                const container = document.getElementById('quoteContainer');
+                container.classList.remove('fade-in');
+                void container.offsetWidth; // Trigger reflow
+                container.classList.add('fade-in');
+            } else {
+                document.getElementById('quoteText').textContent = "No quotes yet. Add your first quote below!";
+                document.getElementById('quoteDate').textContent = '';
+            }
+        }
+
+        function addQuote() {
+            const newQuoteText = document.getElementById('newQuote').value.trim();
+            if (newQuoteText) {
+                const quotes = JSON.parse(localStorage.getItem('starlightQuotes')) || [];
+                const newQuote = {
+                    text: newQuoteText,
+                    date: new Date().toISOString().split('T')[0] // YYYY-MM-DD
+                };
+                quotes.push(newQuote);
+                localStorage.setItem('starlightQuotes', JSON.stringify(quotes));
+                
+                document.getElementById('newQuote').value = '';
+                alert('Quote added successfully!');
+                getRandomQuote(); // Show the newly added quote
+            } else {
+                alert('Please write a quote before saving');
+            }
+        }
+
+        // Display a random quote on page load
+        window.onload = getRandomQuote;
+    </script>
+</body>
+</html>
