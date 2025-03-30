@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight - My Guiding Light</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+        .star {
+            animation: twinkle 5s infinite;
+        }
+        .star:nth-child(2n) {
+            animation-delay: 1s;
+        }
+        .star:nth-child(3n) {
+            animation-delay: 2s;
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-indigo-900 via-purple-900 to-pink-900 min-h-screen text-white font-['Poppins']">
+    <!-- Star Background -->
+    <div class="fixed inset-0 overflow-hidden z-0">
+        <div class="absolute w-full h-full">
+            <template x-for="i in 100" :key="i">
+                <div class="star absolute rounded-full bg-white" 
+                    :style="`top: ${Math.random()*100}%; left: ${Math.random()*100}%; width: ${Math.random()*3}px; height: ${Math.random()*3}px;`"></div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="relative z-10 py-6 px-4 md:px-12 flex justify-between items-center">
+        <div class="text-2xl font-['Playfair_Display'] font-bold">Starlight</div>
+        <div class="hidden md:flex space-x-8">
+            <a href="#home" class="hover:text-pink-300 transition">Home</a>
+            <a href="quotes.html" class="hover:text-pink-300 transition">Quotes</a>
+            <a href="gallery.html" class="hover:text-pink-300 transition">Gallery</a>
+            <a href="memories.html" class="hover:text-pink-300 transition">Memories</a>
+            <a href="poems.html" class="hover:text-pink-300 transition">Poems</a>
+        </div>
+        <button class="md:hidden text-2xl">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <main id="home" class="relative z-10 container mx-auto px-4 py-20 flex flex-col items-center text-center">
+        <h1 class="text-4xl md:text-6xl font-['Playfair_Display'] font-bold mb-6 pulse">
+            My Starlight
+        </h1>
+        <p class="text-xl md:text-2xl max-w-2xl mb-12">
+            The one who brought light into my life and changed me forever
+        </p>
+        
+        <div class="flex space-x-8 md:space-x-16 mb-16">
+            <!-- Profile Photo Placeholders -->
+            <div class="relative group cursor-pointer" onclick="openModal('me')">
+                <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white text-2xl shadow-lg">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-pink-600 text-white px-3 py-1 rounded-full text-sm whitespace-nowrap">
+                    Me
+                </div>
+            </div>
+            
+            <div class="relative group cursor-pointer" onclick="openModal('starlight')">
+                <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-pink-400 to-yellow-500 flex items-center justify-center text-white text-2xl shadow-lg pulse">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-pink-600 text-white px-3 py-1 rounded-full text-sm whitespace-nowrap">
+                    Starlight
+                </div>
+            </div>
+        </div>
+        
+        <a href="quotes.html" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-8 rounded-full transition transform hover:scale-105 shadow-lg">
+            Read My Quotes
+        </a>
+    </main>
+
+    <!-- Photo Modal -->
+    <div id="photoModal" class="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center hidden">
+        <div class="bg-gradient-to-br from-purple-900 to-pink-800 p-6 rounded-lg max-w-md w-full mx-4 relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-white text-2xl">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="text-2xl font-bold mb-4" id="modalTitle">Photo</h2>
+            <div class="mb-4">
+                <input type="file" id="photoUpload" accept="image/*" class="hidden">
+                <label for="photoUpload" class="bg-pink-600 hover:bg-pink-700 text-white py-2 px-4 rounded cursor-pointer inline-block">
+                    Upload Photo
+                </label>
+            </div>
+            <div id="photoPreview" class="w-full h-64 bg-gray-800 rounded flex items-center justify-center">
+                <i class="fas fa-image text-4xl text-gray-500"></i>
+            </div>
+            <button onclick="savePhoto()" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded">
+                Save
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        // Initialize localStorage if empty
+        if (!localStorage.getItem('profilePhotos')) {
+            localStorage.setItem('profilePhotos', JSON.stringify({
+                me: null,
+                starlight: null
+            }));
+        }
+
+        let currentPhotoType = '';
+        
+        function openModal(type) {
+            currentPhotoType = type;
+            document.getElementById('modalTitle').textContent = type === 'me' ? 'My Photo' : 'Starlight Photo';
+            document.getElementById('photoModal').classList.remove('hidden');
+            
+            const photos = JSON.parse(localStorage.getItem('profilePhotos'));
+            const photoPreview = document.getElementById('photoPreview');
+            
+            if (photos[type]) {
+                photoPreview.innerHTML = `<img src="${photos[type]}" class="w-full h-full object-cover rounded">`;
+            } else {
+                photoPreview.innerHTML = '<i class="fas fa-image text-4xl text-gray-500"></i>';
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('photoModal').classList.add('hidden');
+        }
+        
+        document.getElementById('photoUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('photoPreview').innerHTML = 
+                        `<img src="${event.target.result}" class="w-full h-full object-cover rounded">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        function savePhoto() {
+            const fileInput = document.getElementById('photoUpload');
+            if (fileInput.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const photos = JSON.parse(localStorage.getItem('profilePhotos'));
+                    photos[currentPhotoType] = event.target.result;
+                    localStorage.setItem('profilePhotos', JSON.stringify(photos));
+                    closeModal();
+                    alert('Photo saved successfully!');
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                alert('Please select a photo to upload');
+            }
+        }
+    </script>
+</body>
+</html>
