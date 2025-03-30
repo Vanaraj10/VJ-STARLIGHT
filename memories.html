@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memorable Dates - Starlight</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+        .timeline-item {
+            position: relative;
+            margin: 2rem 0;
+            padding-left: 2rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: #6b46c1;
+        }
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-indigo-900 via-purple-900 to-pink-900 min-h-screen text-white font-['Poppins']">
+    <!-- Navigation -->
+    <nav class="py-6 px-4 md:px-12 flex justify-between items-center">
+        <a href="index.html" class="text-2xl font-['Playfair_Display'] font-bold">Starlight</a>
+        <div class="hidden md:flex space-x-8">
+            <a href="index.html" class="hover:text-pink-300 transition">Home</a>
+            <a href="quotes.html" class="hover:text-pink-300 transition">Quotes</a>
+            <a href="gallery.html" class="hover:text-pink-300 transition">Gallery</a>
+            <a href="memories.html" class="text-pink-300 font-semibold">Memories</a>
+            <a href="poems.html" class="hover:text-pink-300 transition">Poems</a>
+        </div>
+        <button class="md:hidden text-2xl">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12">
+        <h1 class="text-3xl md:text-4xl font-['Playfair_Display'] font-bold mb-8 text-center">
+            Our Memorable Dates
+        </h1>
+        
+        <!-- Add New Date -->
+        <div class="max-w-2xl mx-auto bg-purple-900 bg-opacity-50 rounded-xl p-6 mb-12 border border-purple-300 border-opacity-20">
+            <h2 class="text-2xl font-['Playfair_Display'] font-bold mb-4">Add a New Memorable Date</h2>
+            <div class="flex flex-col md:flex-row gap-4 mb-4">
+                <div class="flex-1">
+                    <input type="date" id="memoryDate" class="w-full bg-purple-800 bg-opacity-50 border border-purple-300 border-opacity-30 rounded-lg p-3 text-white placeholder-purple-300">
+                </div>
+                <div class="flex-1">
+                    <input type="text" id="memoryTitle" class="w-full bg-purple-800 bg-opacity-50 border border-purple-300 border-opacity-30 rounded-lg p-3 text-white placeholder-purple-300" placeholder="Title of the event...">
+                </div>
+            </div>
+            <button onclick="saveMemory()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full transition">
+                Save Date
+            </button>
+        </div>
+        
+        <!-- Timeline -->
+        <div id="timeline" class="timeline">
+            <!-- Timeline items will be loaded here -->
+        </div>
+    </main>
+
+    <script>
+        // Initialize memories in localStorage if empty
+        if (!localStorage.getItem('starlightMemories')) {
+            localStorage.setItem('starlightMemories', JSON.stringify([]));
+        }
+
+        // Load memories from localStorage
+        function loadMemories() {
+            const memories = JSON.parse(localStorage.getItem('starlightMemories')) || [];
+            const timeline = document.getElementById('timeline');
+            timeline.innerHTML = '';
+
+            if (memories.length === 0) {
+                timeline.innerHTML = `
+                    <div class="text-center py-12">
+                        <p class="text-xl text-pink-200">No memorable dates yet. Add your first date!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            memories.forEach((memory, index) => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item fade-in';
+                timelineItem.innerHTML = `
+                    <h3 class="text-xl font-bold">${memory.title}</h3>
+                    <p class="text-sm text-gray-300">${new Date(memory.date).toLocaleDateString()}</p>
+                `;
+                timeline.appendChild(timelineItem);
+            });
+        }
+
+        // Save new memory
+        function saveMemory() {
+            const dateInput = document.getElementById('memoryDate').value;
+            const titleInput = document.getElementById('memoryTitle').value.trim();
+
+            if (dateInput && titleInput) {
+                const memories = JSON.parse(localStorage.getItem('starlightMemories')) || [];
+                memories.push({ date: dateInput, title: titleInput });
+                localStorage.setItem('starlightMemories', JSON.stringify(memories));
+
+                // Reset form
+                document.getElementById('memoryDate').value = '';
+                document.getElementById('memoryTitle').value = '';
+
+                // Refresh timeline
+                loadMemories();
+                alert('Memorable date added successfully!');
+            } else {
+                alert('Please fill in both fields before saving.');
+            }
+        }
+
+        // Load memories on page load
+        window.onload = loadMemories;
+    </script>
+</body>
+</html>
